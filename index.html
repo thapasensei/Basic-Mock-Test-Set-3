@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thapa Sensei - JFT Basic A1 Online Preparation Class</title>
+    <!-- Firebase Libraries (v8) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+        
+        body.student-protected {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        
+        /* Fixed Baseline & Furigana Alignment */
+        ruby {
+            display: inline-ruby;
+            ruby-position: over;
+            line-height: 1.8 !important;
+        }
+
+        rt {
+            font-size: 0.6em !important;
+            font-weight: normal !important;
+            color: #0d47a1 !important;
+            white-space: nowrap !important;
+            line-height: 1 !important;
+        }
+
+        u {
+            text-underline-offset: 4px !important;
+            text-decoration-thickness: 1.5px !important;
+        }
+
+        html, body {
+            background-color: #f0f3f8;
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 10px;
+        }
+
+        .welcome-card { 
+            background: white; 
+            width: 100%; 
+            max-width: 1150px; 
+            border-radius: 12px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.12); 
+            overflow: hidden; 
+            border: 1px solid #e0e0e0; 
+            margin: auto;
+        }
+        
+        .header { background: linear-gradient(135deg, #0d47a1, #1976d2); color: white; padding: 18px 12px; text-align: center; }
+        .instructor-name { font-size: 26px; font-weight: 900; color: #ffeb3b; text-shadow: 2px 2px 4px rgba(0,0,0,0.4); margin-bottom: 4px; }
+        .class-title { font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 6px; }
+        .contact-info { font-size: 12px; background: rgba(255, 255, 255, 0.18); display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: 500; }
+        
+        .card-body { padding: 16px; }
+        .student-info { background: #f4f8ff; border: 1px solid #bbdefb; border-left: 6px solid #1976d2; padding: 12px; border-radius: 6px; margin-bottom: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+        .info-item { font-size: 13px; color: #333; }
+        .info-item strong { color: #0d47a1; }
+
+        .name-input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; text-align: left; }
+        .name-input-group label { font-size: 14px; font-weight: bold; color: #0d47a1; }
+        .name-input-group input { padding: 12px; font-size: 15px; border: 2px solid #90caf9; border-radius: 6px; outline: none; width: 100%; }
+
+        .instructions-title { font-size: 16px; color: #0d47a1; font-weight: 700; margin-bottom: 10px; border-bottom: 2px solid #e0e0e0; padding-bottom: 6px; }
+        .instructions-list { margin-left: 18px; margin-bottom: 16px; color: #444; line-height: 1.5; }
+        .instructions-list li { margin-bottom: 6px; font-size: 13.5px; }
+        
+        .agreement { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; font-size: 13.5px; color: #222; cursor: pointer; background: #fafafa; padding: 10px; border-radius: 6px; border: 1px solid #eee; }
+        .agreement input { width: 18px; height: 18px; accent-color: #1976d2; flex-shrink: 0; }
+
+        .start-btn { width: 100%; background-color: #2e7d32; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; }
+        .start-btn:disabled { background-color: #cccccc; cursor: not-allowed; }
+
+        #loginScreen { display: block; }
+        #adminScreen { display: none; }
+        #landingScreen { display: none; }
+        #examScreen { display: none; }
+        
+        .exam-header-bar { display: flex; justify-content: space-between; align-items: center; background: #0d47a1; color: white; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px; font-weight: bold; font-size: 14px; }
+        .timer-box { background: #d32f2f; color: white; padding: 4px 10px; border-radius: 4px; font-size: 14px; }
+
+        .exam-layout-grid { display: grid; grid-template-columns: 52px 1fr; gap: 10px; }
+
+        .left-palette-sidebar { background: #f8f9fa; border: 1px solid #ddd; border-radius: 6px; padding: 4px 2px; height: fit-content; text-align: center; }
+        .palette-label { font-size: 10px; font-weight: bold; color: #0d47a1; margin-bottom: 2px; display: block; border-bottom: 1px solid #ccc; padding-bottom: 1px; }
+        
+        .palette-legend { font-size: 8px; color: #444; margin-bottom: 4px; display: flex; flex-direction: column; gap: 1px; text-align: center; background: #fff; padding: 2px; border-radius: 3px; border: 1px solid #eee; }
+        .legend-item { display: flex; align-items: center; justify-content: center; gap: 2px; }
+        .legend-box { width: 7px; height: 7px; border-radius: 2px; display: inline-block; flex-shrink: 0; }
+
+        .palette-grid { display: grid; grid-template-columns: 1fr; gap: 3px; max-height: 420px; overflow-y: auto; padding-right: 1px; }
+        .palette-btn { width: 100%; height: 28px; border: 1px solid #ccc; background: white; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 11px; display: flex; justify-content: center; align-items: center; }
+        .palette-btn.answered { background: #4caf50; color: white; border-color: #388e3c; } 
+        .palette-btn.current { border: 2px solid #ff9800; background: #fff3e0; font-weight: 800; color: #d84315; } 
+
+        .right-question-area { min-height: 380px; width: 100%; }
+        .question-box { background: #fafafa; border: 1px solid #e0e0e0; padding: 14px; border-radius: 8px; margin-bottom: 12px; }
+        .section-badge { display: inline-block; background: #e3f2fd; color: #0d47a1; padding: 5px 10px; border-radius: 4px; font-size: 13px; font-weight: bold; margin-bottom: 12px; border-left: 4px solid #1976d2; }
+        
+        .jft-audio-box { background: #ffffff; border: 1.5px solid #1976d2; border-radius: 8px; padding: 10px 12px; margin: 0 auto 14px auto; box-shadow: 0 2px 6px rgba(0,0,0,0.06); width: 100%; max-width: 480px; }
+        .audio-status-title { font-size: 12.5px; font-weight: 700; color: #0d47a1; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+        .audio-count-badge { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; }
+        
+        .player-controls-row { display: flex; align-items: center; gap: 10px; }
+        .jft-audio-btn { width: 42px; height: 42px; border-radius: 50%; background: #1976d2; color: white; border: none; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .jft-audio-btn:hover { background: #1565c0; }
+        .jft-audio-btn.disabled { background: #b0bec5; cursor: not-allowed; }
+        .jft-audio-btn.playing { background: #2e7d32; cursor: not-allowed; }
+
+        .progress-bar-container { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+        .progress-track { width: 100%; height: 6px; background: #e0e0e0; border-radius: 3px; overflow: hidden; position: relative; }
+        .progress-fill { height: 100%; width: 0%; background: #2e7d32; transition: width 0.1s linear; }
+        .time-text { font-size: 11px; color: #666; font-family: monospace; align-self: flex-end; }
+
+        .q-container { background: white; border: 1px solid #e0e0e0; padding: 16px; border-radius: 8px; margin-bottom: 14px; text-align: center; }
+        .q-header-title { font-size: 14.5px; font-weight: 800; color: #0d47a1; text-align: left; margin-bottom: 12px; padding-bottom: 4px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .q-text-centered { font-size: 16px; font-weight: bold; color: #222; margin-bottom: 12px; text-align: center; line-height: 2.2; word-break: break-word; }
+        .q-img-centered { max-width: 100%; height: auto; max-height: 320px; border-radius: 8px; margin: 0 auto 14px auto; display: block; border: 1px solid #ccc; box-shadow: 0 2px 8px rgba(0,0,0,0.06); object-fit: contain; }
+        .dialogue-box-centered { background: #f4f8ff; border-left: 4px solid #1976d2; padding: 12px 14px; border-radius: 6px; margin: 0 auto 14px auto; font-size: 15px; line-height: 2.2; white-space: pre-line; text-align: center; max-width: 600px; }
+
+        .options-group-centered { display: flex; flex-direction: column; gap: 10px; max-width: 650px; margin: 0 auto; text-align: left; }
+        .option-label { display: flex; align-items: center; gap: 12px; background: #f9f9f9; padding: 12px 16px; border: 1.5px solid #ddd; border-radius: 8px; cursor: pointer; font-size: 14.5px; transition: all 0.15s ease; width: 100%; word-break: break-word; line-height: 2.0; }
+        .option-label:hover { background: #eef5fc; border-color: #90caf9; }
+        .option-label input[type="radio"] { width: 18px; height: 18px; flex-shrink: 0; accent-color: #1976d2; cursor: pointer; }
+
+        .options-group-images { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; max-width: 650px; margin: 0 auto; justify-content: center; }
+        .option-label-img { display: flex; flex-direction: column; align-items: center; justify-content: center; background: #ffffff; padding: 6px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; width: 100%; position: relative; }
+        .option-label-img:hover { border-color: #90caf9; background: #f4f8ff; }
+        .option-label-img input[type="radio"] { display: none; }
+        .option-label-img.selected { border-color: #1976d2; background: #e3f2fd; box-shadow: 0 0 0 2px #1976d2; }
+        .option-label-img img { width: 100%; height: 105px; object-fit: contain; border-radius: 4px; pointer-events: none; }
+
+        .nav-buttons { display: flex; justify-content: space-between; gap: 10px; margin-top: 12px; }
+        .nav-btn { background: #1976d2; color: white; border: none; padding: 12px 18px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; flex: 1; text-align: center; }
+        #nextSectionBtn { background: #0288d1; display: none; }
+        #submitExamBtn { background: #2e7d32; display: none; }
+
+        .student-table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+        .student-table th, .student-table td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 13px; }
+        .student-table th { background: #1976d2; color: white; }
+        .action-btn-del { background: #d32f2f; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .action-btn-reset { background: #ff9800; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-right: 4px; font-size: 12px; }
+        .action-btn-copy { background: #0288d1; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-right: 4px; font-size: 12px; }
+
+        #resultScreen { display: none; padding: 10px; text-align: left; }
+        .scorecard-box { background: #ffffff; border: 2px solid #0d47a1; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+        .score-header { text-align: center; border-bottom: 2px solid #e0e0e0; padding-bottom: 12px; margin-bottom: 12px; }
+        
+        .eval-status-box { text-align: center; margin-top: 10px; padding: 10px; border-radius: 8px; font-weight: 800; font-size: 15px; }
+        .eval-pass { background: #e8f5e9; color: #2e7d32; border: 1.5px solid #a5d6a7; }
+        .eval-mid { background: #fff8e1; color: #f57f17; border: 1.5px solid #ffe082; }
+        .eval-fail { background: #ffebee; color: #c62828; border: 1.5px solid #ef9a9a; }
+
+        .sec-score-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        .sec-score-table th, .sec-score-table td { border: 1px solid #cfd8dc; padding: 8px; font-size: 13px; }
+        .sec-score-table th { background: #f0f4f8; color: #0d47a1; text-align: left; }
+
+        .error-msg { color: #d32f2f; font-size: 13px; margin-top: 8px; font-weight: bold; display: none; text-align: left; }
+
+        @media (max-width: 768px) {
+            body { padding: 4px; }
+            .welcome-card { border-radius: 8px; }
+            .card-body { padding: 10px; }
+            .instructor-name { font-size: 22px; }
+            .class-title { font-size: 14px; }
+            .exam-layout-grid { grid-template-columns: 1fr; gap: 8px; }
+            .left-palette-sidebar { order: 2; padding: 6px; }
+            .palette-grid { grid-template-columns: repeat(auto-fill, minmax(32px, 1fr)); max-height: 100px; }
+            .palette-btn { height: 26px; font-size: 11px; }
+            .right-question-area { order: 1; }
+            .q-container { padding: 10px 8px; }
+            .q-text-centered { font-size: 15px; }
+            .option-label { font-size: 13.5px; padding: 10px 12px; }
+            .options-group-images { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .option-label-img img { height: 85px; }
+            .nav-btn { padding: 10px; font-size: 13px; }
+            .question-box { padding: 8px; }
+            .jft-audio-box { padding: 8px 10px; }
+        }
+    </style>
+</head>
+<body class="student-protected">
+
+    <!-- Global Audio Tag Fixed -->
+    <div style="display:none;">
+        <audio id="globalJftMedia" preload="auto" playsinline></audio>
+    </div>
+
+    <div id="preloadContainer" style="display:none;"></div>
+
+    <div class="welcome-card">
+        <div class="header">
+            <div class="instructor-name">Thapa Sensei</div>
+            <div class="class-title">JFT Online Preparation Class (JFT-Basic A1 Set 1)</div>
+            <div class="contact-info">📞 Contact / Viber / WhatsApp: <strong>9867222929</strong></div>
+        </div>
+
+        <div class="card-body" id="loginScreen">
+            <div class="instructions-title" style="margin-top:0;">Student Login (विद्यार्थी लगइन - JFT-Basic A1)</div>
+            <p style="font-size: 13.5px; color: #555; margin-bottom: 16px;">Please enter your Full Name and Exam Access Code provided by Sensei.</p>
+
+            <div class="name-input-group">
+                <label for="studentNameInput">Full Name (विद्यार्थीको नाम):</label>
+                <input type="text" id="studentNameInput" placeholder="Enter full name (e.g., Ram Thapa)...">
+            </div>
+
+            <div class="name-input-group">
+                <label for="studentCodeInput">Exam Access Code:</label>
+                <input type="text" id="studentCodeInput" placeholder="Enter access code (e.g., BASIC-8821)..." style="text-transform: uppercase;">
+            </div>
+
+            <div id="studentLoginError" class="error-msg"></div>
+
+            <button class="start-btn" style="margin-top: 10px;" onclick="handleStudentLogin()">Login & Start Practice</button>
+        </div>
+
+        <div class="card-body" id="adminScreen">
+            <div class="instructions-title" style="margin-top:0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <span>👨‍🏫 Teacher Control Panel (JFT-Basic A1)</span>
+                <div style="display:flex; gap:8px;">
+                    <button onclick="startTeacherPracticeExam()" style="background:#0288d1; color:white; border:none; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">▶️ Start Exam as Teacher</button>
+                    <button onclick="logoutAdmin()" style="background:#d32f2f; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-size:12px;">Logout</button>
+                </div>
+            </div>
+
+            <div style="background:#e3f2fd; padding:12px; border-radius:8px; margin-bottom:16px; border:1px solid #90caf9;">
+                <h4 style="color:#0d47a1; margin-bottom:8px; font-size:14px;">➕ Register New Student (Basic Level):</h4>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                    <input type="text" id="newStudentName" placeholder="Student Name..." style="flex:2; min-width:160px; padding:8px; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+                    
+                    <div style="flex:1; min-width:140px; display:flex; flex-direction:column;">
+                        <label style="font-size:11px; color:#0d47a1; font-weight:bold;">Expiry Date:</label>
+                        <input type="date" id="expiryDatePicker" style="padding:6px; border:1px solid #ccc; border-radius:4px; font-weight:bold; color:#0d47a1; background:white; font-size:13px;">
+                    </div>
+
+                    <button onclick="addNewStudent()" style="background:#2e7d32; color:white; border:none; padding:8px 14px; border-radius:4px; font-weight:bold; cursor:pointer; margin-top:auto; font-size:13px;">Generate Code</button>
+                </div>
+            </div>
+
+            <h4 style="color:#333; margin-bottom:6px; font-size:14px;">📋 Registered Students & Access Codes List:</h4>
+            <div style="overflow-x:auto; max-height: 200px; margin-bottom: 16px;">
+                <table class="student-table">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Access Code</th>
+                            <th>Expiry Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTableBody"></tbody>
+                </table>
+            </div>
+
+            <h4 style="color:#0d47a1; margin-bottom:6px; font-size:14px;">📊 Student Exam Performance & Reports (All Attempts History):</h4>
+            <div style="overflow-x:auto; max-height: 220px;">
+                <table class="student-table">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Code</th>
+                            <th>Latest Score</th>
+                            <th>Today's Attempts</th>
+                            <th>All Attempts History (Date & Scores)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentReportTableBody">
+                        <tr><td colspan="5" style="text-align:center;">Loading reports...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-body" id="landingScreen">
+            <div class="student-info">
+                <div class="info-item"><strong>Candidate Name:</strong> <span id="loggedInNameDisplay"></span></div>
+                <div class="info-item"><strong>Test Level:</strong> JFT-Basic A1 Set 1</div>
+                <div class="info-item"><strong>Time Allowed:</strong> 60 Minutes</div>
+                <div class="info-item"><strong>Total Questions:</strong> 56 Questions</div>
+            </div>
+
+            <div class="instructions-title">Examination Guidelines & Instructions</div>
+            <ul class="instructions-list">
+                <li><strong>Section 1:</strong> Script & Vocabulary (Q1 - Q15)</li>
+                <li><strong>Section 2:</strong> Conversation & Expression (Q1 - Q15)</li>
+                <li><strong>Section 3:</strong> Listening Comprehension (Q1 - Q12) - Audio plays up to 2 times only.</li>
+                <li><strong>Section 4:</strong> Reading Comprehension (Q1 - Q14)</li>
+                <li><strong style="color:#d32f2f;">Daily Limit:</strong> You are allowed a maximum of <strong>3 attempts</strong> per day.</li>
+            </ul>
+
+            <label class="agreement">
+                <input type="checkbox" id="agreeCheck" onclick="validateForm()">
+                <span><strong>Confirmation:</strong> I have read and understood all the test rules and guidelines.</span>
+            </label>
+
+            <button id="startBtn" class="start-btn" disabled onclick="startExam()">Start Test Now</button>
+        </div>
+
+        <div class="card-body" id="examScreen">
+            <div class="exam-header-bar">
+                <div id="studentDisplay">User: </div>
+                <div class="timer-box" id="timer">60:00</div>
+            </div>
+
+            <div class="exam-layout-grid">
+                <div class="left-palette-sidebar">
+                    <span class="palette-label" id="paletteSectionLabel">Sec 1</span>
+                    <div class="palette-legend">
+                        <div class="legend-item"><span class="legend-box" style="background:#4caf50;"></span>Ans</div>
+                        <div class="legend-item"><span class="legend-box" style="background:white; border:1px solid #ccc;"></span>Unans</div>
+                    </div>
+                    <div class="palette-grid" id="paletteGrid"></div>
+                </div>
+
+                <div class="right-question-area">
+                    <div class="question-box">
+                        <div class="section-badge" id="sectionBadge">Section 1</div>
+
+                        <div id="audioPlayerContainer" style="display: none;">
+                            <div class="jft-audio-box">
+                                <div class="audio-status-title">
+                                    <span>🎧 Audio Player</span>
+                                    <span class="audio-count-badge" id="playCountText">Remaining: 2/2</span>
+                                </div>
+                                <div class="player-controls-row">
+                                    <button class="jft-audio-btn" id="nativeAudioBar" onclick="toggleAudioPlayback()">▶</button>
+                                    <div class="progress-bar-container">
+                                        <div class="progress-track">
+                                            <div class="progress-fill" id="audioProgressFill"></div>
+                                        </div>
+                                        <div class="time-text" id="audioTimeDisplay">00:00 / 00:00</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="questionsContainer"></div>
+                    </div>
+
+                    <div class="nav-buttons">
+                        <button class="nav-btn" id="prevBtn" onclick="prevStep()">Previous</button>
+                        <button class="nav-btn" id="nextBtn" onclick="nextStep()">Next</button>
+                        <button class="nav-btn" id="nextSectionBtn" onclick="nextSectionConfirm()">Next Section ➡️</button>
+                        <button class="nav-btn" id="submitExamBtn" onclick="submitExam()">Submit Exam</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body" id="resultScreen">
+            <div class="scorecard-box">
+                <div class="score-header">
+                    <h3 style="color:#0d47a1; margin-bottom:4px; font-size:18px;">Basic Level Evaluation & Score Report</h3>
+                    <h4 style="color:#555; font-size:14px; margin-bottom:6px;">Official Score Summary</h4>
+                    <p style="font-size:13px; color:#444;">Candidate: <strong id="resultStudentName"></strong> | Date: <span id="resultDate"></span></p>
+                    <div id="resultPassBadge"></div>
+                </div>
+
+                <h4 style="color:#333; margin-bottom:8px; font-size:14px;">📊 Sectional Score & Performance Breakdown:</h4>
+                <div style="overflow-x:auto;">
+                    <table class="sec-score-table">
+                        <thead>
+                            <tr>
+                                <th>Section Title</th>
+                                <th>Questions</th>
+                                <th>Correct</th>
+                                <th>Scaled Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="secScoreTbody"></tbody>
+                        <tfoot>
+                            <tr style="background:#f4f8ff; font-weight:bold;">
+                                <td colspan="3" style="text-align:right; color:#0d47a1;">TOTAL SCORE:</td>
+                                <td id="finalTotalScore" style="color:#d32f2f; font-size:16px;">0 / 250</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <h4 style="color:#333; margin-bottom:8px; font-size:14px;">📝 Question Review & Answers:</h4>
+            <div id="reviewContainer"></div>
+            <button class="start-btn" style="margin-top: 16px;" onclick="location.reload()">Restart Exam</button>
+        </div>
+    </div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyB9ANXbKemUW4O6guRCoGLDVmsuOLu28Cg",
+        authDomain: "thapasenseijft.firebaseapp.com",
+        databaseURL: "https://thapasenseijft-default-rtdb.firebaseio.com",
+        projectId: "thapasenseijft",
+        storageBucket: "thapasenseijft.firebasestorage.app",
+        messagingSenderId: "127012464750",
+        appId: "1:127012464750:web:b15d215fae778fc02e1e7f",
+        measurementId: "G-MX88P03WGZ"
+    };
+    
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+    const db = firebase.database();
+
+    const DB_STUDENTS = "basic_level_students";
+    const DB_REPORTS = "basic_level_reports";
+    const TEACHER_ADMIN_PASS = "sensei1997"; 
+
+    function getDeviceId() {
+        let deviceId = localStorage.getItem('thapa_basic_level_device_id');
+        if (!deviceId) {
+            deviceId = 'BASICDEV-' + Math.random().toString(36).substring(2, 9) + Date.now();
+            localStorage.setItem('thapa_basic_level_device_id', deviceId);
+        }
+        return deviceId;
+    }
+
+    window.onload = function() {
+        const defaultDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+        document.getElementById('expiryDatePicker').value = defaultDate.toISOString().split('T')[0];
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('admin')) {
+            openAdminPanelWithPrompt();
+        }
+        
+        setTimeout(startBackgroundPreloading, 1000);
+    };
+
+    let isTeacherUser = false;
+
+    document.addEventListener('contextmenu', function(e) {
+        if (!isTeacherUser) {
+            e.preventDefault();
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (!isTeacherUser) {
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || 
+                (e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'p')) ||
+                e.key === 'PrintScreen') {
+                e.preventDefault();
+            }
+        }
+    });
+
+    function startBackgroundPreloading() {
+        const preloadContainer = document.getElementById('preloadContainer');
+        const allImages = new Set();
+        
+        examSteps.forEach(st => {
+            if (st.img) allImages.add(st.img);
+            if (st.options) {
+                st.options.forEach(opt => {
+                    if (typeof opt === 'string' && opt.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+                        allImages.add(opt);
+                    }
+                });
+            }
+            if (st.subQuestions) {
+                st.subQuestions.forEach(sub => {
+                    if (sub.img) allImages.add(sub.img);
+                    if (sub.options) {
+                        sub.options.forEach(opt => {
+                            if (typeof opt === 'string' && opt.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+                                allImages.add(opt);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        allImages.forEach(imgSrc => {
+            const img = new Image();
+            img.src = imgSrc;
+            preloadContainer.appendChild(img);
+        });
+    }
+
+    function openAdminPanelWithPrompt() {
+        const pass = prompt("👨‍🏫 Enter Teacher Control Panel Password (Basic Level):");
+        if (pass === TEACHER_ADMIN_PASS) {
+            isTeacherUser = true;
+            document.body.classList.remove('student-protected');
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminScreen').style.display = 'block';
+            loadAdminStudentTable();
+            loadAdminReportsTable();
+        } else if (pass !== null) {
+            alert("❌ Incorrect Password!");
+            window.location.href = window.location.pathname;
+        }
+    }
+
+    function startTeacherPracticeExam() {
+        isTeacherUser = true;
+        document.body.classList.remove('student-protected');
+        loggedInStudentName = "Thapa Sensei (Teacher)";
+        loggedInStudentCode = "TEACHER_ADMIN";
+        document.getElementById('adminScreen').style.display = 'none';
+        document.getElementById('landingScreen').style.display = 'block';
+        document.getElementById('loggedInNameDisplay').innerText = loggedInStudentName;
+    }
+
+    function logoutAdmin() {
+        window.location.href = window.location.pathname;
+    }
+
+    function addNewStudent() {
+        const nameInput = document.getElementById('newStudentName');
+        const expiryDateVal = document.getElementById('expiryDatePicker').value;
+        const name = nameInput.value.trim();
+        
+        if (!name) { alert("Please enter student name!"); return; }
+        if (!expiryDateVal) { alert("Please select an expiry date!"); return; }
+
+        const code = 'BASIC-' + Math.floor(1000 + Math.random() * 9000);
+        const selectedDate = new Date(expiryDateVal + "T23:59:59");
+        const expiryTimestamp = selectedDate.getTime();
+
+        db.ref(DB_STUDENTS + '/' + code).set({
+            name: name, 
+            code: code, 
+            boundDeviceId: null,
+            expiryTimestamp: expiryTimestamp,
+            createdDate: new Date().toLocaleDateString()
+        }, (error) => {
+            if (!error) {
+                nameInput.value = "";
+                alert(`🎉 Student registered successfully!\n\nName: ${name}\nAccess Code: ${code}\nExpiry Date: ${selectedDate.toLocaleDateString()}`);
+            }
+        });
+    }
+
+    function copyStudentDetails(name, code) {
+        const textToCopy = `Thapa Sensei Basic Level Class\nStudent Name: ${name}\nAccess Code: ${code}`;
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert(`📋 Copied details for ${name} (${code})!`);
+        });
+    }
+
+    function loadAdminStudentTable() {
+        db.ref(DB_STUDENTS).on('value', (snapshot) => {
+            const tbody = document.getElementById('studentTableBody');
+            tbody.innerHTML = "";
+            const students = snapshot.val();
+            if (!students) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No students registered yet.</td></tr>`;
+                return;
+            }
+
+            const now = Date.now();
+
+            Object.keys(students).forEach(code => {
+                const stu = students[code];
+                const expDateStr = stu.expiryTimestamp ? new Date(stu.expiryTimestamp).toLocaleDateString() : "No Expiry";
+                const isExpired = stu.expiryTimestamp && (now > stu.expiryTimestamp);
+
+                let statusText = "";
+                if (isExpired) {
+                    statusText = `<span style="color:#d32f2f; font-weight:bold;">⛔ Expired</span>`;
+                } else if (stu.boundDeviceId) {
+                    statusText = `<span style="color:#2e7d32; font-weight:bold;">🔒 Active (${stu.boundDeviceId.substring(0,6)}...)</span>`;
+                } else {
+                    statusText = `<span style="color:#ff9800; font-weight:bold;">🔓 Unused</span>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr style="${isExpired ? 'background:#ffebee;' : ''}">
+                        <td><strong>${stu.name}</strong></td>
+                        <td><code style="background:#eee; padding:2px 5px; color:#0d47a1; font-weight:bold;">${stu.code}</code></td>
+                        <td><small>${expDateStr}</small></td>
+                        <td>${statusText}</td>
+                        <td>
+                            <button class="action-btn-copy" onclick="copyStudentDetails('${stu.name}', '${stu.code}')">Copy Details</button>
+                            <button class="action-btn-reset" onclick="resetStudentDevice('${stu.code}')">Reset</button>
+                            <button class="action-btn-del" onclick="deleteStudent('${stu.code}')">Del</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        });
+    }
+
+    function loadAdminReportsTable() {
+        db.ref(DB_REPORTS).on('value', (snapshot) => {
+            const tbody = document.getElementById('studentReportTableBody');
+            tbody.innerHTML = "";
+            const reports = snapshot.val();
+            if (!reports) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No exam attempts recorded yet.</td></tr>`;
+                return;
+            }
+
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            Object.keys(reports).forEach(code => {
+                let rep = reports[code];
+                let todayAttemptCount = (rep.attempts && rep.attempts[todayStr]) ? rep.attempts[todayStr] : 0;
+                
+                let historyHtml = "<ul style='margin:0; padding-left:15px; font-size:12px;'>";
+                if (rep.history && Array.isArray(rep.history)) {
+                    rep.history.forEach((h, idx) => {
+                        historyHtml += `<li>Attempt ${idx+1} (${h.date}): <strong style="color:#0d47a1;">${h.score} / 250</strong></li>`;
+                    });
+                } else {
+                    historyHtml += `<li>Last: ${rep.lastScore || 0} / 250 (${rep.lastDate || 'N/A'})</li>`;
+                }
+                historyHtml += "</ul>";
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${rep.name || 'Unknown'}</strong></td>
+                        <td><code>${code}</code></td>
+                        <td><strong style="color:#0d47a1;">${rep.lastScore || 0} / 250</strong></td>
+                        <td><span style="background:#e3f2fd; padding:2px 6px; border-radius:4px; font-weight:bold;">${todayAttemptCount} / 3</span></td>
+                        <td>${historyHtml}</td>
+                    </tr>
+                `;
+            });
+        });
+    }
+
+    function resetStudentDevice(code) {
+        if (confirm(`Do you want to reset device lock for Access Code (${code})?`)) {
+            db.ref(DB_STUDENTS + '/' + code + '/boundDeviceId').set(null);
+        }
+    }
+
+    function deleteStudent(code) {
+        if (confirm(`Are you sure you want to delete this student?`)) {
+            db.ref(DB_STUDENTS + '/' + code).remove();
+            db.ref(DB_REPORTS + '/' + code).remove();
+        }
+    }
+
+    let loggedInStudentName = "";
+    let loggedInStudentCode = "";
+
+    function handleStudentLogin() {
+        const nameInput = document.getElementById('studentNameInput').value.trim();
+        const codeInput = document.getElementById('studentCodeInput').value.trim().toUpperCase();
+        const errorBox = document.getElementById('studentLoginError');
+
+        if (!nameInput || !codeInput) {
+            errorBox.style.display = 'block';
+            errorBox.innerHTML = "❌ Please enter both Full Name and Access Code!";
+            return;
+        }
+
+        if (nameInput.toLowerCase() === "thapa sensei" && codeInput === "1997") {
+            errorBox.style.display = 'none';
+            openAdminPanelWithPrompt();
+            return;
+        }
+
+        db.ref(DB_STUDENTS + '/' + codeInput).once('value').then((snapshot) => {
+            if (!snapshot.exists()) {
+                errorBox.style.display = 'block';
+                errorBox.innerHTML = "❌ Invalid Access Code! Please check with Sensei.";
+                return;
+            }
+
+            const student = snapshot.val();
+            
+            if (student.name.toLowerCase() !== nameInput.toLowerCase()) {
+                errorBox.style.display = 'block';
+                errorBox.innerHTML = "❌ Name does not match with Access Code!";
+                return;
+            }
+
+            const now = Date.now();
+            if (student.expiryTimestamp && now > student.expiryTimestamp) {
+                errorBox.style.display = 'block';
+                errorBox.innerHTML = `⛔ **Access Code Expired:** Code expired on ${new Date(student.expiryTimestamp).toLocaleDateString()}.`;
+                return;
+            }
+
+            const currentDeviceId = getDeviceId();
+
+            if (!student.boundDeviceId) {
+                db.ref(DB_STUDENTS + '/' + codeInput + '/boundDeviceId').set(currentDeviceId);
+            } else if (student.boundDeviceId !== currentDeviceId) {
+                errorBox.style.display = 'block';
+                errorBox.innerHTML = `🚫 **Security Warning:** This Access Code is registered on another device.`;
+                return;
+            }
+
+            const todayStr = new Date().toISOString().split('T')[0];
+            db.ref(`${DB_REPORTS}/${codeInput}/attempts/${todayStr}`).once('value').then((attemptSnap) => {
+                let currentCount = attemptSnap.val() || 0;
+                if (currentCount >= 3 && codeInput !== "TEACHER_ADMIN") {
+                    errorBox.style.display = 'block';
+                    errorBox.innerHTML = `⛔ **Daily Limit Reached:** You have already attempted the exam 3 times today. Please try again tomorrow!`;
+                    return;
+                }
+
+                errorBox.style.display = 'none';
+                isTeacherUser = false;
+                document.body.classList.add('student-protected');
+                loggedInStudentName = student.name;
+                loggedInStudentCode = codeInput;
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('landingScreen').style.display = 'block';
+                document.getElementById('loggedInNameDisplay').innerText = loggedInStudentName;
+            });
+        });
+    }
+
+    function validateForm() {
+        const check = document.getElementById('agreeCheck').checked;
+        document.getElementById('startBtn').disabled = !check;
+    }
+
+    const examSteps = [
+        { sectionId: 1, sectionName: "Section 1: Script & Vocabulary", type: "single", qIdx: 0, img: "a1.jpeg", qText: "", options: ["まくら", "かさ", "ふとん", "せんたくき"], answer: 1 },
+        { sectionId: 1, sectionName: "Section 1: Script & Vocabulary", type: "single", qIdx: 1, img: "a2.jpeg", qText: "", options: ["はさみ", "えんぴつ", "けしゴム", "のり"], answer: 0 },
+        { sectionId: 1, sectionName: "Section 1: Script & Vocabulary", type: "single", qIdx: 2, img: "a3.jpeg", qText: "", options: ["料理をするとき", "雨の日に外を歩くとき", "電車に乗るとき", "部屋を掃除するとき"], answer: 1 },
+        { sectionId: 1, sectionName: "Section 1: Script & Vocabulary", type: "single", qIdx: 3, img: "a4.jpeg", qText: "", options: ["荷物を送っています。", "電話をかけています。", "写真を撮っています。", "電車を待っています。"], answer: 2 },
+        { sectionId: 1, sectionName: "Section 1: Script & Vocabulary", type: "single", qIdx: 4, img: null, qText: "「<u>準備</u>」の 読み方は どれですか。", options: ["じゅんび", "じゅびん", "じゅんぴ", "じゅび"], answer: 0 },
+        { sectionId: 1, sectionName: "Section 1: Script & Vocabulary", type: "single", qIdx: 5, img: null, qText: "「<u>変更</u>」の 読み方は どれですか。", options: ["へんこう", "へんごう", "べんこう", "へんこ"], answer: 0 },
+        { sectionId: 1, sectionName: "Section 1: Script & Vocabulary", type: "single", qIdx: 6, img: null, qText: "「<u>必要</u>」の 読み方は どれですか。", options: ["ひつよ", "ひじょう", "ひつよう", "ひっよう"], answer: 2 },
+        { sectionId: 1, sectionName: "Section 1: Script & Vocabulary", type: "single", qIdx: 7, img: null, qText: "「<u>そうだん</u>」を 漢字で 書くと、どれですか。", options: ["相談", "相短", "想談", "相段"], answer: 0 },
+        { sectionId: 1, sectionName: "Section 1: Script & Vocabulary", type: "single", qIdx: 8, img: null, qText: "「<u>あんない</u>」を 漢字で 書くと、どれですか。", options: ["案格", "案内", "案肉", "案入"], answer: 1 },
+        { sectionId: 1, sectionName: "Section 1: Script & Vocabulary", type: "single", qIdx: 9, img: null, qText: "「<u>うけつけ</u>」を 漢字で 書くと、どれですか。", options: ["受着", "受つ付", "受付", "受付け"], answer: 2 },
+        { sectionId: 1, sectionName: "Section 1: Script & Vocabulary", type: "single", qIdx: 10, img: null, qText: "電車に乗る前に、駅の＿＿＿で<ruby>切符<rt>きっぷ</rt></ruby>を買いました。", options: ["入口", "窓", "売り場", "<ruby>改札<rt>かいさつ</rt></ruby>"], answer: 2 },
+        { sectionId: 1, sectionName: "Section 1: Script & Vocabulary", type: "single", qIdx: 11, img: null, qText: "仕事が終わったら、<ruby>明日<rt>あした</rt></ruby>の<ruby>分<rt>ぶん</rt></ruby>の<ruby>資料<rt>しりょう</rt></ruby>を＿＿＿してください。", options: ["<ruby>準備<rt>じゅんび</rt></ruby>", "<ruby>提出<rt>ていしゅつ</rt></ruby>", "<ruby>交代<rt>こうたい</rt></ruby>", "案内"], answer: 0 },
+        { sectionId: 1, sectionName: "Section 1: Script & Vocabulary", type: "single", qIdx: 12, img: null, qText: "この<ruby>部屋<rt>へや</rt></ruby>は<ruby>午後<rt>ごご</rt></ruby>6時まで＿＿＿できます。", options: ["利用", "利用する", "利用して", "利用した"], answer: 0 },
+        { sectionId: 1, sectionName: "Section 1: Script & Vocabulary", type: "single", qIdx: 13, img: null, qText: "<ruby>作業<rt>さぎょう</rt></ruby>が終わったら、<ruby>机<rt>つくえ</rt></ruby>の<ruby>上<rt>うえ</rt></ruby>を＿＿＿してください。", options: ["<ruby>清掃<rt>せいそう</rt></ruby>", "<ruby>整理<rt>せいり</rt></ruby>", "<ruby>出発<rt>しゅっぱつ</rt></ruby>", "<ruby>連絡<rt>れんらく</rt></ruby>"], answer: 1 },
+        { sectionId: 1, sectionName: "Section 1: Script & Vocabulary", type: "single", qIdx: 14, img: null, qText: "<ruby>機械<rt>きかい</rt></ruby>の<ruby>調子<rt>ちょうし</rt></ruby>が<ruby>悪<rt>わる</rt></ruby>いときは、すぐに<ruby>責任者<rt>せきにんしゃ</rt></ruby>に＿＿＿してください。", options: ["<ruby>報告<rt>ほうこく</rt></ruby>", "<ruby>予約<rt>よやく</rt></ruby>", "<ruby>出発<rt>しゅっぱつ</rt></ruby>", "<ruby>掃除<rt>そうじ</rt></ruby>"], answer: 0 },
+
+        { sectionId: 2, sectionName: "Section 2: Conversation & Expression", type: "single", qIdx: 15, img: "b1.jpeg", dialogueText: null, options: ["どこへ書けばいいですか", "何時に帰りますか", "いつ食べますか", "だれと行きますか"], answer: 0 },
+        { sectionId: 2, sectionName: "Section 2: Conversation & Expression", type: "single", qIdx: 16, img: "b2.jpeg", dialogueText: null, options: ["10時のままですね", "11時からですね", "会議はありませんね", "今日になったんですね"], answer: 1 },
+        { sectionId: 2, sectionName: "Section 2: Conversation & Expression", type: "single", qIdx: 17, img: "b3.jpeg", dialogueText: null, options: ["いただきません", "おねがいでした", "ありがとうございます", "すみませんでしたか"], answer: 2 },
+        { sectionId: 2, sectionName: "Section 2: Conversation & Expression", type: "single", qIdx: 18, img: "b4.jpeg", dialogueText: null, options: ["午前中にあります", "日曜日ではありません", "買い物をしました", "午後なら大丈夫です"], answer: 3 },
+        { sectionId: 2, sectionName: "Section 2: Conversation & Expression", type: "single", qIdx: 19, img: "b5.jpeg", dialogueText: null, options: ["受付は何時ですか", "受付の机ですね", "書類はありませんね", "机を使いませんね"], answer: 1 },
+        { sectionId: 2, sectionName: "Section 2: Conversation & Expression", type: "single", qIdx: 20, img: "b6.jpeg", dialogueText: null, options: ["予約を食べてください", "時間を買ってください", "気をつけて来てください", "明日帰ってください"], answer: 2 },
+        { sectionId: 2, sectionName: "Section 2: Conversation & Expression", type: "single", qIdx: 21, img: "b7.jpeg", dialogueText: null, options: ["コピーを帰します", "こちらの青いボタンです", "赤い紙を食べます", "そのまま寝てください"], answer: 1 },
+        { sectionId: 2, sectionName: "Section 2: Conversation & Expression", type: "single", qIdx: 22, img: "b8.jpeg", dialogueText: null, options: ["病院は書類です", "午後は昨日です", "3時から見ません", "3時までなら大丈夫です"], answer: 3 },
+        { sectionId: 2, sectionName: "Section 2: Conversation & Expression", type: "single", qIdx: 23, img: "b9.jpeg", dialogueText: null, options: ["5000円以上ならカードが使えるんですね", "5000円以下なら無料ですね", "カードはどこにもありませんね", "現金は使えませんね"], answer: 0 },
+        { sectionId: 2, sectionName: "Section 2: Conversation & Expression", type: "single", qIdx: 24, img: "b10.jpeg", dialogueText: null, options: ["今日仕事をしますね", "イベントを食べましょう", "また今度行きましょう", "明日の仕事を買いましょう"], answer: 2 },
+        { sectionId: 2, sectionName: "Section 2: Conversation & Expression", type: "single", qIdx: 25, img: "b11.jpeg", dialogueText: null, options: ["昨日の夜です", "食事のあとです", "来週です", "仕事の前でした"], answer: 1 },
+        { sectionId: 2, sectionName: "Section 2: Conversation & Expression", type: "single", qIdx: 26, img: "b12.jpeg", dialogueText: null, options: ["バスを食べます", "駅がありません", "20分ぐらいです", "昨日行きました"], answer: 2 },
+
+        {
+            sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c1_2.mp3", 
+            subQuestions: [
+                { qIdx: 30, qText: "二人は何時にどこで会いますか。", options: ["8時に駅の北口", "8時半に駅の南口", "8時に事務所の前", "8時半にトラックの中"], answer: 0 },
+                { qIdx: 31, qText: "男の人は何を持って行きますか。", options: ["お弁当とお金", "軍手とお茶", "はさみと箱", "傘と帽子"], answer: 1 }
+            ]
+        },
+        {
+            sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c3_4.mp3",
+            subQuestions: [
+                { qIdx: 32, qText: "二人は昼ごはんに何を食べますか。", options: ["ラーメン", "カレー", "サンドイッチ", "パスタ"], answer: 2 },
+                { qIdx: 33, qText: "二人はどこで食べものを買いますか。", options: ["c4_o1.jpeg", "c4_o2.jpeg", "c4_o3.jpeg", "c4_o4.jpeg"], answer: 2 }
+            ]
+        },
+        {
+            sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c5.mp3",
+            subQuestions: [
+                { qIdx: 34, qText: "男の人はどうしますか。", options: ["自転車で行く", "歩いて行く", "バスで行く", "家に帰る"], answer: 2 }
+            ]
+        },
+        {
+            sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c6.mp3",
+            subQuestions: [
+                { qIdx: 35, qText: "男の人は雨の中、どのように帰りますか。", options: ["c6_o1.jpeg", "c6_o2.jpeg", "c6_o3.jpeg", "c6_o4.jpeg"], answer: 2 }
+            ]
+        },
+        {
+            sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c7.mp3",
+            subQuestions: [
+                { qIdx: 36, qText: "男の人は帰る前に何をしますか。", options: ["資料を印刷する", "会議をする", "買い物をする", "電話をする"], answer: 0 }
+            ]
+        },
+        {
+            sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c8.mp4",
+            subQuestions: [
+                { qIdx: 37, qText: "明日の授業はどこですか。", options: ["101教室", "201教室", "301教室", "401教室"], answer: 2 }
+            ]
+        },
+        {
+            sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c9.mp3",
+            subQuestions: [
+                { qIdx: 38, qText: "女の人はどこで降りますか。", options: ["病院の前", "病院の次のバス停", "駅の前", "次の駅"], answer: 1 }
+            ]
+        },
+        {
+            sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c10.mp4",
+            subQuestions: [
+                { qIdx: 39, qText: "会議は何時からですか。", options: ["1時", "2時", "2時半", "3時"], answer: 3 }
+            ]
+        },
+        {
+            sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c11.mp3",
+            subQuestions: [
+                { qIdx: 40, qText: "男の人は何時までに片付けますか。", options: ["4時30分", "4時50分", "5時", "5時10分"], answer: 1 }
+            ]
+        },
+        {
+            sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c12.mp3",
+            subQuestions: [
+                { qIdx: 41, qText: "二人は何を注文しますか。", options: ["c12_o1.jpeg", "c12_o2.jpeg", "c12_o3.jpeg", "c12_o4.jpeg"], answer: 1 }
+            ]
+        },
+
+        {
+            sectionId: 4, sectionName: "Section 4: Reading Comprehension", type: "reading_group", img: "d1_2.jpeg", paragraph: null,
+            subQuestions: [
+                { qIdx: 42, qText: "パソコンを使う仕事は、いつしたほうがいいですか。", options: ["金曜日の午前中", "金曜日の午後1時", "金曜日の午後2時", "金曜日の午後3時以降"], answer: 0 },
+                { qIdx: 43, qText: "午後2時に会社ですることができないのは何ですか。", options: ["話をすること", "パソコンを使う仕事", "人に会うこと", "昼ごはんを食べること"], answer: 1 }
+            ]
+        },
+        {
+            sectionId: 4, sectionName: "Section 4: Reading Comprehension", type: "reading_group", img: "d3_4.jpeg", paragraph: null,
+            subQuestions: [
+                { qIdx: 44, qText: "野菜が安くなるのはいつですか。", options: ["金曜日", "月曜日だけ", "毎日", "土曜日と日曜日"], answer: 3 },
+                { qIdx: 45, qText: "どんな人が袋をもらえますか。", options: ["d4_o1.jpeg", "d4_o2.jpeg", "d4_o3.jpeg", "d4_o4.jpeg"], answer: 0 }
+            ]
+        },
+        {
+            sectionId: 4, sectionName: "Section 4: Reading Comprehension", type: "reading_group", img: "d5_6.jpeg", paragraph: null,
+            subQuestions: [
+                { qIdx: 46, qText: "二人は何時に会いますか。", options: ["7時30分", "8時", "8時30分", "9時"], answer: 2 },
+                { qIdx: 47, qText: "山田さんはどこへ行けばいいですか。", options: ["駅の中", "駅のホーム", "コンビニの中", "駅の外のコンビニの前"], answer: 3 }
+            ]
+        },
+        {
+            sectionId: 4, sectionName: "Section 4: Reading Comprehension", type: "reading_group", img: "d7_8.jpeg", paragraph: null,
+            subQuestions: [
+                { qIdx: 48, qText: "日曜日にランチセットを注文すると、ドリンクはいくらですか。", options: ["無料", "100円", "200円", "300円"], answer: 2 },
+                { qIdx: 49, qText: "午後1時45分に店へ行った場合、何を注文できませんか。", options: ["ランチセット", "水", "ドリンク", "普通のメニュー"], answer: 0 }
+            ]
+        },
+        {
+            sectionId: 4, sectionName: "Section 4: Reading Comprehension", type: "reading_group", img: "d9_10.jpeg", paragraph: null,
+            subQuestions: [
+                { qIdx: 50, qText: "午後8時30分にホテルへ着く場合、何をしますか。", options: ["ホテルに電話する", "朝食を食べる", "午後3時に戻る", "予約をキャンセルする"], answer: 0 },
+                { qIdx: 51, qText: "朝食を食べられる時間はどれですか。", options: ["午前6時30分", "午前8時", "午前9時30分", "午前10時"], answer: 1 }
+            ]
+        },
+        {
+            sectionId: 4, sectionName: "Section 4: Reading Comprehension", type: "reading_group", img: "d11_12.jpeg", paragraph: null,
+            subQuestions: [
+                { qIdx: 52, qText: "月曜日はどの場所で授業をしますか。", options: ["d11_o1.jpeg", "d11_o2.jpeg", "d11_o3.jpeg", "d11_o4.jpeg"], answer: 2 },
+                { qIdx: 53, qText: "火曜日からはどうなりますか。", options: ["授業がなくなります。", "302教室を使います。", "いつもの教室に戻ります。", "3階で授業を続けます。"], answer: 2 }
+            ]
+        },
+        {
+            sectionId: 4, sectionName: "Section 4: Reading Comprehension", type: "reading_group", img: "d13_14.jpeg", paragraph: null,
+            subQuestions: [
+                { qIdx: 54, qText: "このイベントに持っていけるものはどれですか。", options: ["大きい机", "大きいソファー", "小さい電気製品", "大きい<ruby>棚<rt>たな</rt></ruby>"], answer: 2 },
+                { qIdx: 55, qText: "10時から11時まで何がありますか。", options: ["食事", "説明", "買い物", "掃除"], answer: 1 }
+            ]
+        }
+    ];
+
+    let currentStep = 0;
+    let userAnswers = new Array(56).fill(null);
+    let timerInterval, timeLeft = 60 * 60, audioPlayCounts = {}, isAudioPlayingCurrently = false;
+
+    function startExam() {
+        if (loggedInStudentCode && loggedInStudentCode !== "TEACHER_ADMIN") {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const attemptRef = db.ref(`${DB_REPORTS}/${loggedInStudentCode}/attempts/${todayStr}`);
+            attemptRef.transaction((currentCount) => {
+                return (currentCount || 0) + 1;
+            });
+            db.ref(`${DB_REPORTS}/${loggedInStudentCode}/name`).set(loggedInStudentName);
+        }
+
+        document.getElementById('landingScreen').style.display = 'none';
+        document.getElementById('examScreen').style.display = 'block';
+        document.getElementById('studentDisplay').innerText = "User: " + loggedInStudentName;
+        loadStep(currentStep); startTimer();
+    }
+
+    function updatePalette() {
+        const grid = document.getElementById('paletteGrid');
+        grid.innerHTML = "";
+        let currentSecId = examSteps[currentStep].sectionId;
+        document.getElementById('paletteSectionLabel').innerText = `Sec ${currentSecId}`;
+
+        examSteps.forEach((st) => {
+            if (st.sectionId === currentSecId) {
+                let qList = st.type === 'single' ? [st.qIdx] : st.subQuestions.map(s => s.qIdx);
+                qList.forEach(qIdx => {
+                    let btn = document.createElement('button');
+                    btn.className = "palette-btn";
+                    btn.innerText = qIdx + 1;
+                    if (userAnswers[qIdx] !== null) btn.classList.add('answered');
+
+                    let isCurrent = (st.type === 'single' && examSteps[currentStep].qIdx === qIdx) ||
+                                    ((st.type === 'listening' || st.type === 'reading_group') && examSteps[currentStep].subQuestions && examSteps[currentStep].subQuestions.some(sub => sub.qIdx === qIdx));
+                    if (isCurrent) btn.classList.add('current');
+
+                    btn.onclick = () => jumpToQuestion(qIdx);
+                    grid.appendChild(btn);
+                });
+            }
+        });
+    }
+
+    function renderOptionsHTML(options, qIdx) {
+        let isOptionImg = options[0] && options[0].match(/\.(jpeg|jpg|gif|png|webp)$/i);
+
+        if (isOptionImg) {
+            return `
+                <div class="options-group-images">
+                    ${options.map((opt, oIdx) => {
+                        let isSelected = userAnswers[qIdx] === oIdx;
+                        return `
+                            <label class="option-label-img ${isSelected ? 'selected' : ''}" onclick="selectImageOption(${qIdx},${oIdx})">
+                                <input type="radio" name="opt_${qIdx}" value="${oIdx}" ${isSelected ? 'checked' : ''}>
+                                <img src="${opt}" onerror="this.src='https://via.placeholder.com/120x90?text=Option+${oIdx+1}'">
+                            </label>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        } else {
+            return `
+                <div class="options-group-centered">
+                    ${options.map((opt, oIdx) => `
+                        <label class="option-label">
+                            <input type="radio" name="opt_${qIdx}" value="${oIdx}" ${userAnswers[qIdx] === oIdx ? 'checked' : ''} onclick="saveAnswer(${qIdx},${oIdx})">
+                            <span>${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            `;
+        }
+    }
+
+    function selectImageOption(qIdx, oIdx) {
+        saveAnswer(qIdx, oIdx);
+        let optionsGroup = document.querySelectorAll(`input[name="opt_${qIdx}"]`);
+        optionsGroup.forEach((input) => {
+            let label = input.closest('.option-label-img');
+            if (label) {
+                if (parseInt(input.value) === oIdx) {
+                    label.classList.add('selected');
+                    input.checked = true;
+                } else {
+                    label.classList.remove('selected');
+                }
+            }
+        });
+    }
+
+    function loadStep(stepIdx) {
+        currentStep = stepIdx;
+        const step = examSteps[stepIdx];
+        
+        document.getElementById('sectionBadge').innerText = step.sectionName;
+        const qContainer = document.getElementById('questionsContainer');
+        const audioContainer = document.getElementById('audioPlayerContainer');
+        qContainer.innerHTML = "";
+        
+        stopAudioPlayback();
+
+        if (step.type === 'single') {
+            audioContainer.style.display = 'none';
+            
+            qContainer.innerHTML = `
+                <div class="q-container">
+                    <div class="q-header-title"><span>Question ${step.qIdx + 1}</span></div>
+                    ${step.qText ? `<div class="q-text-centered">${step.qText}</div>` : ''}
+                    ${step.dialogueText ? `<div class="dialogue-box-centered">${step.dialogueText}</div>` : ''}
+                    ${step.img ? `<img src="${step.img}" class="q-img-centered" loading="lazy" onerror="this.style.display='none'">` : ''}
+                    
+                    ${renderOptionsHTML(step.options, step.qIdx)}
+                </div>
+            `;
+        } else if (step.type === 'listening') {
+            audioContainer.style.display = 'block';
+            if (audioPlayCounts[stepIdx] === undefined) audioPlayCounts[stepIdx] = 0;
+            updatePlayButtonState(stepIdx);
+
+            let media = document.getElementById('globalJftMedia');
+            if (step.audioSrc) {
+                media.src = step.audioSrc;
+                media.load();
+            }
+
+            let htmlContent = "";
+            step.subQuestions.forEach(sub => {
+                htmlContent += `
+                    <div class="q-container">
+                        <div class="q-header-title"><span>Question ${sub.qIdx + 1}</span></div>
+                        ${sub.qText ? `<div class="q-text-centered">${sub.qText}</div>` : ''}
+                        ${sub.img ? `<img src="${sub.img}" class="q-img-centered" loading="lazy" onerror="this.style.display='none'">` : ''}
+                        
+                        ${renderOptionsHTML(sub.options, sub.qIdx)}
+                    </div>
+                `;
+            });
+            qContainer.innerHTML = htmlContent;
+        } else if (step.type === 'reading_group') {
+            audioContainer.style.display = 'none';
+            let htmlContent = "";
+            if (step.paragraph) {
+                htmlContent += `<div class="dialogue-box-centered" style="text-align:left; background:#fffbe6; border-left:4px solid #fbc02d; font-size:15px; max-width:100%; white-space:pre-line;">${step.paragraph}</div>`;
+            }
+            if (step.img) {
+                htmlContent += `<img src="${step.img}" class="q-img-centered" loading="lazy" style="max-height:320px;" onerror="this.style.display='none'">`;
+            }
+            
+            step.subQuestions.forEach(sub => {
+                htmlContent += `
+                    <div class="q-container">
+                        <div class="q-header-title"><span>Question ${sub.qIdx + 1}</span></div>
+                        ${sub.qText ? `<div class="q-text-centered">${sub.qText}</div>` : ''}
+                        ${sub.img ? `<img src="${sub.img}" class="q-img-centered" loading="lazy" onerror="this.style.display='none'">` : ''}
+                        
+                        ${renderOptionsHTML(sub.options, sub.qIdx)}
+                    </div>
+                `;
+            });
+            qContainer.innerHTML = htmlContent;
+        }
+
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const nextSectionBtn = document.getElementById('nextSectionBtn');
+        const submitBtn = document.getElementById('submitExamBtn');
+
+        prevBtn.style.display = 'inline-block';
+        nextBtn.style.display = 'inline-block';
+        nextSectionBtn.style.display = 'none';
+        submitBtn.style.display = 'none';
+
+        let isLastInCurrentSection = (stepIdx < examSteps.length - 1) && (examSteps[stepIdx + 1].sectionId !== step.sectionId);
+
+        if (stepIdx === 0) { prevBtn.disabled = true; } 
+        else { prevBtn.disabled = (examSteps[stepIdx - 1].sectionId !== step.sectionId); }
+
+        if (stepIdx === examSteps.length - 1) {
+            nextBtn.style.display = 'none';
+            submitBtn.style.display = 'inline-block';
+        } else if (isLastInCurrentSection) {
+            nextBtn.style.display = 'none';
+            nextSectionBtn.style.display = 'inline-block';
+        }
+
+        updatePalette();
+    }
+
+    function updatePlayButtonState(stepIdx) {
+        let count = audioPlayCounts[stepIdx] || 0;
+        let remaining = 2 - count;
+        let audioBar = document.getElementById('nativeAudioBar');
+        let countText = document.getElementById('playCountText');
+        
+        if (remaining > 0) {
+            countText.innerText = `Remaining: ${remaining}/2`;
+            if (isAudioPlayingCurrently) {
+                audioBar.className = "jft-audio-btn playing";
+                audioBar.innerText = "🔊";
+            } else {
+                audioBar.className = "jft-audio-btn";
+                audioBar.innerText = "▶";
+            }
+        } else {
+            countText.innerText = `Finished (0/2)`;
+            audioBar.className = "jft-audio-btn disabled";
+            audioBar.innerText = "⏹";
+        }
+        if (!isAudioPlayingCurrently) {
+            document.getElementById('audioProgressFill').style.width = "0%";
+            document.getElementById('audioTimeDisplay').innerText = "00:00 / 00:00";
+        }
+    }
+
+    function stopAudioPlayback() {
+        let media = document.getElementById('globalJftMedia');
+        if (media && !media.paused) {
+            media.pause();
+            media.currentTime = 0;
+        }
+        isAudioPlayingCurrently = false;
+    }
+
+    function toggleAudioPlayback() {
+        let step = examSteps[currentStep];
+        if (step.type !== 'listening') return;
+
+        let audioBar = document.getElementById('nativeAudioBar');
+        if (audioBar.classList.contains('disabled')) return;
+
+        if (isAudioPlayingCurrently) return; 
+
+        let count = audioPlayCounts[currentStep] || 0;
+        if (count >= 2) return;
+
+        let media = document.getElementById('globalJftMedia');
+
+        let playPromise = media.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                isAudioPlayingCurrently = true;
+                audioPlayCounts[currentStep] = (audioPlayCounts[currentStep] || 0) + 1;
+                updatePlayButtonState(currentStep);
+            }).catch(e => {
+                alert("❌ Audio Error: Check if audio files exist or check path.");
+            });
+        }
+
+        media.ontimeupdate = function() {
+            if (media.duration) {
+                let pct = (media.currentTime / media.duration) * 100;
+                document.getElementById('audioProgressFill').style.width = pct + "%";
+                
+                let curM = Math.floor(media.currentTime / 60), curS = Math.floor(media.currentTime % 60);
+                let durM = Math.floor(media.duration / 60), durS = Math.floor(media.duration % 60);
+                document.getElementById('audioTimeDisplay').innerText = 
+                    `${curM < 10 ? '0':''}${curM}:${curS < 10 ? '0':''}${curS} / ${durM < 10 ? '0':''}${durM}:${durS < 10 ? '0':''}${durS}`;
+            }
+        };
+
+        media.onended = function() {
+            isAudioPlayingCurrently = false;
+            updatePlayButtonState(currentStep);
+        };
+    }
+
+    function saveAnswer(qIdx, optIdx) {
+        userAnswers[qIdx] = optIdx;
+        updatePalette();
+    }
+
+    function nextStep() {
+        if (currentStep < examSteps.length - 1) loadStep(currentStep + 1);
+    }
+
+    function prevStep() {
+        if (currentStep > 0 && examSteps[currentStep - 1].sectionId === examSteps[currentStep].sectionId) {
+            loadStep(currentStep - 1);
+        }
+    }
+
+    function nextSectionConfirm() {
+        if (confirm("⚠️ Section Completion Alert:\n\nOnce you move to the next section, you cannot return to this section to change any answers.\n\nAre you sure you want to proceed to the next section?")) {
+            if (currentStep < examSteps.length - 1) loadStep(currentStep + 1);
+        }
+    }
+
+    function jumpToQuestion(qIdx) {
+        for (let i = 0; i < examSteps.length; i++) {
+            let st = examSteps[i];
+            let match = (st.type === 'single' && st.qIdx === qIdx) || 
+                        ((st.type === 'listening' || st.type === 'reading_group') && st.subQuestions.some(sub => sub.qIdx === qIdx));
+
+            if (match) {
+                if (st.sectionId === examSteps[currentStep].sectionId) {
+                    loadStep(i);
+                }
+                break;
+            }
+        }
+    }
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            if (timeLeft <= 0) { clearInterval(timerInterval); submitExam(); return; }
+            timeLeft--;
+            let mins = Math.floor(timeLeft / 60), secs = timeLeft % 60;
+            document.getElementById('timer').innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }, 1000);
+    }
+
+    function submitExam() {
+        stopAudioPlayback();
+        clearInterval(timerInterval);
+
+        let secStats = {
+            1: { name: "1. Script & Vocabulary", total: 15, correct: 0 },
+            2: { name: "2. Conversation & Expression", total: 15, correct: 0 },
+            3: { name: "3. Listening Comprehension", total: 12, correct: 0 },
+            4: { name: "4. Reading Comprehension", total: 14, correct: 0 }
+        };
+
+        let reviewHtml = "";
+        let totalQuestions = 56;
+
+        examSteps.forEach(st => {
+            let subs = st.type === 'single' ? [{ qIdx: st.qIdx, answer: st.answer, options: st.options }] : st.subQuestions;
+            subs.forEach(sub => {
+                let uAns = userAnswers[sub.qIdx];
+                let isCorr = (uAns === sub.answer);
+                if (isCorr) {
+                    secStats[st.sectionId].correct++;
+                }
+
+                let isOptionImg = sub.options[0] && sub.options[0].match(/\.(jpeg|jpg|gif|png|webp)$/i);
+                let userAnsText = uAns !== null ? (isOptionImg ? `Option ${uAns + 1}` : sub.options[uAns]) : 'Not Answered';
+                let correctAnsText = isOptionImg ? `Option ${sub.answer + 1}` : sub.options[sub.answer];
+
+                reviewHtml += `
+                    <div style="background:#fafafa; border:1px solid #ddd; padding:10px; margin-bottom:8px; border-radius:5px;">
+                        <div><strong>Question ${sub.qIdx + 1}</strong></div>
+                        <div>Your Answer: <span style="color:${isCorr?'#2e7d32':'#d32f2f'}; font-weight:bold;">${userAnsText}</span></div>
+                        <div>Correct Answer: <span style="color:#2e7d32; font-weight:bold;">${correctAnsText}</span></div>
+                    </div>
+                `;
+            });
+        });
+
+        let grandCorrect = 0;
+        let secTbodyHtml = "";
+
+        Object.keys(secStats).forEach(sId => {
+            let sec = secStats[sId];
+            grandCorrect += sec.correct;
+            let secScore = Math.round((sec.correct / sec.total) * 62.5); 
+            secTbodyHtml += `
+                <tr>
+                    <td><strong>${sec.name}</strong></td>
+                    <td>${sec.total}</td>
+                    <td><strong style="color:${sec.correct>0?'#2e7d32':'#333'}">${sec.correct} / ${sec.total}</strong></td>
+                    <td><strong>${secScore} / 62</strong></td>
+                </tr>
+            `;
+        });
+
+        let finalJftScore = Math.round(10 + (grandCorrect / totalQuestions) * 240); 
+
+        if (loggedInStudentCode && loggedInStudentCode !== "TEACHER_ADMIN") {
+            const reportRef = db.ref(`${DB_REPORTS}/${loggedInStudentCode}`);
+            reportRef.once('value').then((snap) => {
+                let data = snap.val() || {};
+                let history = data.history || [];
+                
+                history.push({
+                    score: finalJftScore,
+                    date: new Date().toLocaleString()
+                });
+
+                reportRef.update({
+                    name: loggedInStudentName,
+                    lastScore: finalJftScore,
+                    lastDate: new Date().toLocaleDateString(),
+                    history: history
+                });
+            });
+        }
+
+        document.getElementById('examScreen').style.display = 'none';
+        document.getElementById('resultScreen').style.display = 'block';
+
+        document.getElementById('resultStudentName').innerText = loggedInStudentName;
+        document.getElementById('resultDate').innerText = new Date().toLocaleDateString();
+        
+        let badgeBox = document.getElementById('resultPassBadge');
+        if (finalJftScore >= 200) {
+            badgeBox.innerHTML = `
+                <div class="eval-status-box eval-pass">
+                    🎉 PASSED - LEVEL A1/A2 ACHIEVED (Standard Criteria Met)<br>
+                    <span style="font-size:13px; font-weight:normal; color:#333;">Scale Grade: High Proficiency (200 - 250 Points)</span>
+                </div>
+            `;
+        } else if (finalJftScore >= 170) {
+            badgeBox.innerHTML = `
+                <div class="eval-status-box eval-mid">
+                    ⚠️ MARGINAL / NEAR PASS (A1 Level)<br>
+                    <span style="font-size:13px; font-weight:normal; color:#333;">Scale Grade: Intermediate Proficiency (170 - 199 Points)</span>
+                </div>
+            `;
+        } else if (finalJftScore >= 140) {
+            badgeBox.innerHTML = `
+                <div class="eval-status-box eval-fail">
+                    ❌ NEEDS IMPROVEMENT (NOT PASSED)<br>
+                    <span style="font-size:13px; font-weight:normal; color:#333;">Scale Grade: Basic Proficiency (140 - 169 Points)</span>
+                </div>
+            `;
+        } else {
+            badgeBox.innerHTML = `
+                <div class="eval-status-box eval-fail">
+                    ❌ BELOW PASSING STANDARDS<br>
+                    <span style="font-size:13px; font-weight:normal; color:#333;">Scale Grade: Low Proficiency (Below 140 Points)</span>
+                </div>
+            `;
+        }
+
+        document.getElementById('secScoreTbody').innerHTML = secTbodyHtml;
+        document.getElementById('finalTotalScore').innerText = `${finalJftScore} / 250`;
+        document.getElementById('reviewContainer').innerHTML = reviewHtml;
+    }
+</script>
+</body>
+</html>
