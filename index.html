@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thapa Sensei - JFT Basic A1 Online Preparation Class</title>
+    <title>Thapa Sensei - JFT Basic A1 Online Preparation Class (Set 3)</title>
     <!-- Firebase Libraries (v8) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -17,25 +17,9 @@
             -ms-user-select: none;
         }
         
-        /* Fixed Baseline & Furigana Alignment */
-        ruby {
-            display: inline-ruby;
-            ruby-position: over;
-            line-height: 1.8 !important;
-        }
-
-        rt {
-            font-size: 0.6em !important;
-            font-weight: normal !important;
-            color: #0d47a1 !important;
-            white-space: nowrap !important;
-            line-height: 1 !important;
-        }
-
-        u {
-            text-underline-offset: 4px !important;
-            text-decoration-thickness: 1.5px !important;
-        }
+        ruby { display: inline-ruby; ruby-position: over; line-height: 1.8 !important; }
+        rt { font-size: 0.6em !important; font-weight: normal !important; color: #0d47a1 !important; white-space: nowrap !important; line-height: 1 !important; }
+        u { text-underline-offset: 4px !important; text-decoration-thickness: 1.5px !important; }
 
         html, body {
             background-color: #f0f3f8;
@@ -48,17 +32,7 @@
             padding: 10px;
         }
 
-        .welcome-card { 
-            background: white; 
-            width: 100%; 
-            max-width: 1150px; 
-            border-radius: 12px; 
-            box-shadow: 0 5px 20px rgba(0,0,0,0.12); 
-            overflow: hidden; 
-            border: 1px solid #e0e0e0; 
-            margin: auto;
-        }
-        
+        .welcome-card { background: white; width: 100%; max-width: 1150px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.12); overflow: hidden; border: 1px solid #e0e0e0; margin: auto; }
         .header { background: linear-gradient(135deg, #0d47a1, #1976d2); color: white; padding: 18px 12px; text-align: center; }
         .instructor-name { font-size: 26px; font-weight: 900; color: #ffeb3b; text-shadow: 2px 2px 4px rgba(0,0,0,0.4); margin-bottom: 4px; }
         .class-title { font-size: 16px; font-weight: 700; color: #ffffff; margin-bottom: 6px; }
@@ -154,6 +128,53 @@
         .action-btn-reset { background: #ff9800; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-right: 4px; font-size: 12px; }
         .action-btn-copy { background: #0288d1; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-right: 4px; font-size: 12px; }
 
+        .register-form-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .form-group-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .form-group-item label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #0d47a1;
+        }
+        .form-group-item input {
+            height: 38px;
+            padding: 8px 12px;
+            border: 1px solid #90caf9;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+        }
+        .form-group-item input:focus {
+            border-color: #1976d2;
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+        }
+        .btn-generate {
+            height: 38px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 0 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .btn-generate:hover {
+            background: #1b5e20;
+        }
+
         #resultScreen { display: none; padding: 10px; text-align: left; }
         .scorecard-box { background: #ffffff; border: 2px solid #0d47a1; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
         .score-header { text-align: center; border-bottom: 2px solid #e0e0e0; padding-bottom: 12px; margin-bottom: 12px; }
@@ -188,14 +209,15 @@
             .nav-btn { padding: 10px; font-size: 13px; }
             .question-box { padding: 8px; }
             .jft-audio-box { padding: 8px 10px; }
+            .register-form-row { flex-direction: column; align-items: stretch; }
+            .btn-generate { width: 100%; }
         }
     </style>
 </head>
 <body class="student-protected">
 
-    <!-- Global Audio Tag Fixed -->
     <div style="display:none;">
-        <audio id="globalJftMedia" preload="auto" playsinline></audio>
+        <audio id="globalJftMedia" preload="auto" playsinline crossorigin="anonymous"></audio>
     </div>
 
     <div id="preloadContainer" style="display:none;"></div>
@@ -203,12 +225,12 @@
     <div class="welcome-card">
         <div class="header">
             <div class="instructor-name">Thapa Sensei</div>
-            <div class="class-title">JFT Online Preparation Class (JFT-Basic A1 Set 1)</div>
+            <div class="class-title">JFT Online Preparation Class (JFT-Basic A1 Set 3)</div>
             <div class="contact-info">📞 Contact / Viber / WhatsApp: <strong>9867222929</strong></div>
         </div>
 
         <div class="card-body" id="loginScreen">
-            <div class="instructions-title" style="margin-top:0;">Student Login (विद्यार्थी लगइन - JFT-Basic A1)</div>
+            <div class="instructions-title" style="margin-top:0;">Student Login (विद्यार्थी लगइन - JFT-Basic A1 Set 3)</div>
             <p style="font-size: 13.5px; color: #555; margin-bottom: 16px;">Please enter your Full Name and Exam Access Code provided by Sensei.</p>
 
             <div class="name-input-group">
@@ -228,28 +250,31 @@
 
         <div class="card-body" id="adminScreen">
             <div class="instructions-title" style="margin-top:0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                <span>👨‍🏫 Teacher Control Panel (JFT-Basic A1)</span>
+                <span>👨‍🏫 Teacher Control Panel (JFT-Basic A1 Set 3)</span>
                 <div style="display:flex; gap:8px;">
                     <button onclick="startTeacherPracticeExam()" style="background:#0288d1; color:white; border:none; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">▶️ Start Exam as Teacher</button>
                     <button onclick="logoutAdmin()" style="background:#d32f2f; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-size:12px;">Logout</button>
                 </div>
             </div>
 
-            <div style="background:#e3f2fd; padding:12px; border-radius:8px; margin-bottom:16px; border:1px solid #90caf9;">
-                <h4 style="color:#0d47a1; margin-bottom:8px; font-size:14px;">➕ Register New Student (Basic Level):</h4>
-                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                    <input type="text" id="newStudentName" placeholder="Student Name..." style="flex:2; min-width:160px; padding:8px; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+            <div style="background:#e3f2fd; padding:14px; border-radius:8px; margin-bottom:16px; border:1px solid #90caf9;">
+                <h4 style="color:#0d47a1; margin-bottom:10px; font-size:14px;">➕ Register New Student (Basic Level):</h4>
+                <div class="register-form-row">
+                    <div class="form-group-item" style="flex:2; min-width:180px;">
+                        <label for="newStudentName">Student Name:</label>
+                        <input type="text" id="newStudentName" placeholder="Enter Full Name...">
+                    </div>
                     
-                    <div style="flex:1; min-width:140px; display:flex; flex-direction:column;">
-                        <label style="font-size:11px; color:#0d47a1; font-weight:bold;">Expiry Date:</label>
-                        <input type="date" id="expiryDatePicker" style="padding:6px; border:1px solid #ccc; border-radius:4px; font-weight:bold; color:#0d47a1; background:white; font-size:13px;">
+                    <div class="form-group-item" style="flex:1; min-width:150px;">
+                        <label for="expiryDatePicker">Expiry Date:</label>
+                        <input type="date" id="expiryDatePicker">
                     </div>
 
-                    <button onclick="addNewStudent()" style="background:#2e7d32; color:white; border:none; padding:8px 14px; border-radius:4px; font-weight:bold; cursor:pointer; margin-top:auto; font-size:13px;">Generate Code</button>
+                    <button onclick="addNewStudent()" class="btn-generate">Generate Code</button>
                 </div>
             </div>
 
-            <h4 style="color:#333; margin-bottom:6px; font-size:14px;">📋 Registered Students & Access Codes List:</h4>
+            <h4 style="color:#333; margin-bottom:6px; font-size:14px;">📋 Registered Students List:</h4>
             <div style="overflow-x:auto; max-height: 200px; margin-bottom: 16px;">
                 <table class="student-table">
                     <thead>
@@ -265,20 +290,19 @@
                 </table>
             </div>
 
-            <h4 style="color:#0d47a1; margin-bottom:6px; font-size:14px;">📊 Student Exam Performance & Reports (All Attempts History):</h4>
-            <div style="overflow-x:auto; max-height: 220px;">
+            <h4 style="color:#0d47a1; margin-bottom:6px; font-size:14px;">📊 Student Today's Exam Performance & Scores:</h4>
+            <div style="overflow-x:auto; max-height: 250px;">
                 <table class="student-table">
                     <thead>
                         <tr>
                             <th>Student Name</th>
                             <th>Code</th>
-                            <th>Latest Score</th>
-                            <th>Today's Attempts</th>
-                            <th>All Attempts History (Date & Scores)</th>
+                            <th>Today's Scores (Attempt Breakdown)</th>
+                            <th>Latest Date / Time</th>
                         </tr>
                     </thead>
                     <tbody id="studentReportTableBody">
-                        <tr><td colspan="5" style="text-align:center;">Loading reports...</td></tr>
+                        <tr><td colspan="4" style="text-align:center;">Loading reports...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -287,18 +311,18 @@
         <div class="card-body" id="landingScreen">
             <div class="student-info">
                 <div class="info-item"><strong>Candidate Name:</strong> <span id="loggedInNameDisplay"></span></div>
-                <div class="info-item"><strong>Test Level:</strong> JFT-Basic A1 Set 1</div>
+                <div class="info-item"><strong>Test Level:</strong> JFT-Basic A1 Set 3</div>
                 <div class="info-item"><strong>Time Allowed:</strong> 60 Minutes</div>
-                <div class="info-item"><strong>Total Questions:</strong> 56 Questions</div>
+                <div class="info-item"><strong>Total Questions:</strong> 53 Questions</div>
             </div>
 
             <div class="instructions-title">Examination Guidelines & Instructions</div>
             <ul class="instructions-list">
                 <li><strong>Section 1:</strong> Script & Vocabulary (Q1 - Q15)</li>
-                <li><strong>Section 2:</strong> Conversation & Expression (Q1 - Q15)</li>
-                <li><strong>Section 3:</strong> Listening Comprehension (Q1 - Q12) - Audio plays up to 2 times only.</li>
-                <li><strong>Section 4:</strong> Reading Comprehension (Q1 - Q14)</li>
-                <li><strong style="color:#d32f2f;">Daily Limit:</strong> You are allowed a maximum of <strong>3 attempts</strong> per day.</li>
+                <li><strong>Section 2:</strong> Conversation & Expression (Q16 - Q26)</li>
+                <li><strong>Section 3:</strong> Listening Comprehension (Q27 - Q38) - Audio plays up to 2 times only.</li>
+                <li><strong>Section 4:</strong> Reading Comprehension (Q39 - Q52)</li>
+                <li><strong style="color:#d32f2f;">Daily Limit:</strong> You are allowed a maximum of <strong>5 attempts</strong> per day.</li>
             </ul>
 
             <label class="agreement">
@@ -364,7 +388,7 @@
             <div class="scorecard-box">
                 <div class="score-header">
                     <h3 style="color:#0d47a1; margin-bottom:4px; font-size:18px;">Basic Level Evaluation & Score Report</h3>
-                    <h4 style="color:#555; font-size:14px; margin-bottom:6px;">Official Score Summary</h4>
+                    <h4 style="color:#555; font-size:14px; margin-bottom:6px;">Official Score Summary (Set 3)</h4>
                     <p style="font-size:13px; color:#444;">Candidate: <strong id="resultStudentName"></strong> | Date: <span id="resultDate"></span></p>
                     <div id="resultPassBadge"></div>
                 </div>
@@ -413,7 +437,7 @@
     const db = firebase.database();
 
     const DB_STUDENTS = "basic_level_students";
-    const DB_REPORTS = "basic_level_reports";
+    const DB_REPORTS = "basic_level_reports_set3";
     const TEACHER_ADMIN_PASS = "sensei1997"; 
 
     function getDeviceId() {
@@ -462,6 +486,11 @@
         
         examSteps.forEach(st => {
             if (st.img) allImages.add(st.img);
+            if (st.audioSrc) {
+                const aud = new Audio();
+                aud.preload = "auto";
+                aud.src = st.audioSrc;
+            }
             if (st.options) {
                 st.options.forEach(opt => {
                     if (typeof opt === 'string' && opt.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
@@ -491,7 +520,7 @@
     }
 
     function openAdminPanelWithPrompt() {
-        const pass = prompt("👨‍🏫 Enter Teacher Control Panel Password (Basic Level):");
+        const pass = prompt("👨‍🏫 Enter Teacher Control Panel Password (Basic Level Set 3):");
         if (pass === TEACHER_ADMIN_PASS) {
             isTeacherUser = true;
             document.body.classList.remove('student-protected');
@@ -573,16 +602,16 @@
                 if (isExpired) {
                     statusText = `<span style="color:#d32f2f; font-weight:bold;">⛔ Expired</span>`;
                 } else if (stu.boundDeviceId) {
-                    statusText = `<span style="color:#2e7d32; font-weight:bold;">🔒 Active (${stu.boundDeviceId.substring(0,6)}...)</span>`;
+                    statusText = `<span style="color:#2e7d32; font-weight:bold;">🔒 Active</span>`;
                 } else {
                     statusText = `<span style="color:#ff9800; font-weight:bold;">🔓 Unused</span>`;
                 }
 
                 tbody.innerHTML += `
-                    <tr style="${isExpired ? 'background:#ffebee;' : ''}">
+                    <tr style="${isExpired ? 'background:#fff3e0;' : ''}">
                         <td><strong>${stu.name}</strong></td>
                         <td><code style="background:#eee; padding:2px 5px; color:#0d47a1; font-weight:bold;">${stu.code}</code></td>
-                        <td><small>${expDateStr}</small></td>
+                        <td><small style="font-weight:bold; color:#0d47a1;">${expDateStr}</small></td>
                         <td>${statusText}</td>
                         <td>
                             <button class="action-btn-copy" onclick="copyStudentDetails('${stu.name}', '${stu.code}')">Copy Details</button>
@@ -601,7 +630,7 @@
             tbody.innerHTML = "";
             const reports = snapshot.val();
             if (!reports) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No exam attempts recorded yet.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">No exam attempts recorded yet for Set 3.</td></tr>`;
                 return;
             }
 
@@ -609,25 +638,24 @@
 
             Object.keys(reports).forEach(code => {
                 let rep = reports[code];
-                let todayAttemptCount = (rep.attempts && rep.attempts[todayStr]) ? rep.attempts[todayStr] : 0;
                 
-                let historyHtml = "<ul style='margin:0; padding-left:15px; font-size:12px;'>";
-                if (rep.history && Array.isArray(rep.history)) {
-                    rep.history.forEach((h, idx) => {
-                        historyHtml += `<li>Attempt ${idx+1} (${h.date}): <strong style="color:#0d47a1;">${h.score} / 250</strong></li>`;
+                let scoresHtml = "";
+                if (rep.lastExamDate === todayStr && rep.dailyScores && Array.isArray(rep.dailyScores)) {
+                    scoresHtml = "<div style='display:flex; flex-wrap:wrap; gap:6px;'>";
+                    rep.dailyScores.forEach((sc, idx) => {
+                        scoresHtml += `<span style="background:#e3f2fd; color:#0d47a1; border:1px solid #90caf9; padding:2px 6px; border-radius:4px; font-size:12px; font-weight:bold;">#${idx+1}: ${sc}/250</span>`;
                     });
+                    scoresHtml += "</div>";
                 } else {
-                    historyHtml += `<li>Last: ${rep.lastScore || 0} / 250 (${rep.lastDate || 'N/A'})</li>`;
+                    scoresHtml = `<span style="color:#888; font-style:italic;">No attempts today (Last: ${rep.lastScore || 0}/250)</span>`;
                 }
-                historyHtml += "</ul>";
 
                 tbody.innerHTML += `
                     <tr>
                         <td><strong>${rep.name || 'Unknown'}</strong></td>
                         <td><code>${code}</code></td>
-                        <td><strong style="color:#0d47a1;">${rep.lastScore || 0} / 250</strong></td>
-                        <td><span style="background:#e3f2fd; padding:2px 6px; border-radius:4px; font-weight:bold;">${todayAttemptCount} / 3</span></td>
-                        <td>${historyHtml}</td>
+                        <td>${scoresHtml}</td>
+                        <td><small style="color:#555;">${rep.lastDate || 'N/A'}</small></td>
                     </tr>
                 `;
             });
@@ -700,11 +728,18 @@
             }
 
             const todayStr = new Date().toISOString().split('T')[0];
-            db.ref(`${DB_REPORTS}/${codeInput}/attempts/${todayStr}`).once('value').then((attemptSnap) => {
-                let currentCount = attemptSnap.val() || 0;
-                if (currentCount >= 3 && codeInput !== "TEACHER_ADMIN") {
+
+            db.ref(`${DB_REPORTS}/${codeInput}`).once('value').then((repSnap) => {
+                let repData = repSnap.val() || {};
+                let currentCount = 0;
+
+                if (repData.lastExamDate === todayStr && repData.dailyScores) {
+                    currentCount = repData.dailyScores.length;
+                }
+
+                if (currentCount >= 5 && codeInput !== "TEACHER_ADMIN") {
                     errorBox.style.display = 'block';
-                    errorBox.innerHTML = `⛔ **Daily Limit Reached:** You have already attempted the exam 3 times today. Please try again tomorrow!`;
+                    errorBox.innerHTML = `⛔ **Daily Limit Reached:** You have already attempted the exam 5 times today for Set 3. Please try again tomorrow!`;
                     return;
                 }
 
@@ -758,131 +793,122 @@
         {
             sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c1_2.mp3", 
             subQuestions: [
-                { qIdx: 30, qText: "二人は何時にどこで会いますか。", options: ["8時に駅の北口", "8時半に駅の南口", "8時に事務所の前", "8時半にトラックの中"], answer: 0 },
-                { qIdx: 31, qText: "男の人は何を持って行きますか。", options: ["お弁当とお金", "軍手とお茶", "はさみと箱", "傘と帽子"], answer: 1 }
+                { qIdx: 27, qText: "二人は何時にどこで会いますか。", options: ["8時に駅の北口", "8時半に駅の南口", "8時に事務所の前", "8時半にトラックの中"], answer: 0 },
+                { qIdx: 28, qText: "男の人は何を持って行きますか。", options: ["お弁当とお金", "軍手とお茶", "はさみと箱", "傘と帽子"], answer: 1 }
             ]
         },
         {
             sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c3_4.mp3",
             subQuestions: [
-                { qIdx: 32, qText: "二人は昼ごはんに何を食べますか。", options: ["ラーメン", "カレー", "サンドイッチ", "パスタ"], answer: 2 },
-                { qIdx: 33, qText: "二人はどこで食べものを買いますか。", options: ["c4_o1.jpeg", "c4_o2.jpeg", "c4_o3.jpeg", "c4_o4.jpeg"], answer: 2 }
+                { qIdx: 29, qText: "二人は昼ごはんに何を食べますか。", options: ["ラーメン", "カレー", "サンドイッチ", "パスタ"], answer: 2 },
+                { qIdx: 30, qText: "二人はどこで食べものを買いますか。", options: ["c4_o1.jpeg", "c4_o2.jpeg", "c4_o3.jpeg", "c4_o4.jpeg"], answer: 2 }
             ]
         },
         {
             sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c5.mp3",
             subQuestions: [
-                { qIdx: 34, qText: "男の人はどうしますか。", options: ["自転車で行く", "歩いて行く", "バスで行く", "家に帰る"], answer: 2 }
+                { qIdx: 31, qText: "男の人はどうしますか。", options: ["自転車で行く", "歩いて行く", "バスで行く", "家に帰る"], answer: 2 }
             ]
         },
         {
             sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c6.mp3",
             subQuestions: [
-                { qIdx: 35, qText: "男の人は雨の中、どのように帰りますか。", options: ["c6_o1.jpeg", "c6_o2.jpeg", "c6_o3.jpeg", "c6_o4.jpeg"], answer: 2 }
+                { qIdx: 32, qText: "男の人は雨の中、どのように帰りますか。", options: ["c6_o1.jpeg", "c6_o2.jpeg", "c6_o3.jpeg", "c6_o4.jpeg"], answer: 2 }
             ]
         },
         {
             sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c7.mp3",
             subQuestions: [
-                { qIdx: 36, qText: "男の人は帰る前に何をしますか。", options: ["資料を印刷する", "会議をする", "買い物をする", "電話をする"], answer: 0 }
+                { qIdx: 33, qText: "男の人は帰る前に何をしますか。", options: ["資料を印刷する", "会議をする", "買い物をする", "電話をする"], answer: 0 }
             ]
         },
         {
             sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c8.mp4",
             subQuestions: [
-                { qIdx: 37, qText: "明日の授業はどこですか。", options: ["101教室", "201教室", "301教室", "401教室"], answer: 2 }
+                { qIdx: 34, qText: "明日の授業はどこですか。", options: ["101教室", "201教室", "301教室", "401教室"], answer: 2 }
             ]
         },
         {
             sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c9.mp3",
             subQuestions: [
-                { qIdx: 38, qText: "女の人はどこで降りますか。", options: ["病院の前", "病院の次のバス停", "駅の前", "次の駅"], answer: 1 }
+                { qIdx: 35, qText: "女の人はどこで降りますか。", options: ["病院の前", "病院の次のバス停", "駅の前", "次の駅"], answer: 1 }
             ]
         },
         {
             sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c10.mp4",
             subQuestions: [
-                { qIdx: 39, qText: "会議は何時からですか。", options: ["1時", "2時", "2時半", "3時"], answer: 3 }
+                { qIdx: 36, qText: "会議は何時からですか。", options: ["1時", "2時", "2時半", "3時"], answer: 3 }
             ]
         },
         {
             sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c11.mp3",
             subQuestions: [
-                { qIdx: 40, qText: "男の人は何時までに片付けますか。", options: ["4時30分", "4時50分", "5時", "5時10分"], answer: 1 }
+                { qIdx: 37, qText: "男の人は何時までに片付けますか。", options: ["4時30分", "4時50分", "5時", "5時10分"], answer: 1 }
             ]
         },
         {
             sectionId: 3, sectionName: "Section 3: Listening Comprehension", type: "listening", audioSrc: "c12.mp3",
             subQuestions: [
-                { qIdx: 41, qText: "二人は何を注文しますか。", options: ["c12_o1.jpeg", "c12_o2.jpeg", "c12_o3.jpeg", "c12_o4.jpeg"], answer: 1 }
+                { qIdx: 38, qText: "二人は何を注文しますか。", options: ["c12_o1.jpeg", "c12_o2.jpeg", "c12_o3.jpeg", "c12_o4.jpeg"], answer: 1 }
             ]
         },
 
         {
             sectionId: 4, sectionName: "Section 4: Reading Comprehension", type: "reading_group", img: "d1_2.jpeg", paragraph: null,
             subQuestions: [
-                { qIdx: 42, qText: "パソコンを使う仕事は、いつしたほうがいいですか。", options: ["金曜日の午前中", "金曜日の午後1時", "金曜日の午後2時", "金曜日の午後3時以降"], answer: 0 },
-                { qIdx: 43, qText: "午後2時に会社ですることができないのは何ですか。", options: ["話をすること", "パソコンを使う仕事", "人に会うこと", "昼ごはんを食べること"], answer: 1 }
+                { qIdx: 39, qText: "パソコンを使う仕事は、いつしたほうがいいですか。", options: ["金曜日の午前中", "金曜日の午後1時", "金曜日の午後2時", "金曜日の午後3時以降"], answer: 0 },
+                { qIdx: 40, qText: "午後2時に会社ですることができないのは何ですか。", options: ["話をすること", "パソコンを使う仕事", "人に会うこと", "昼ごはんを食べること"], answer: 1 }
             ]
         },
         {
             sectionId: 4, sectionName: "Section 4: Reading Comprehension", type: "reading_group", img: "d3_4.jpeg", paragraph: null,
             subQuestions: [
-                { qIdx: 44, qText: "野菜が安くなるのはいつですか。", options: ["金曜日", "月曜日だけ", "毎日", "土曜日と日曜日"], answer: 3 },
-                { qIdx: 45, qText: "どんな人が袋をもらえますか。", options: ["d4_o1.jpeg", "d4_o2.jpeg", "d4_o3.jpeg", "d4_o4.jpeg"], answer: 0 }
+                { qIdx: 41, qText: "野菜が安くなるのはいつですか。", options: ["金曜日", "月曜日だけ", "毎日", "土曜日と日曜日"], answer: 3 },
+                { qIdx: 42, qText: "どんな人が袋をもらえますか。", options: ["d4_o1.jpeg", "d4_o2.jpeg", "d4_o3.jpeg", "d4_o4.jpeg"], answer: 0 }
             ]
         },
         {
             sectionId: 4, sectionName: "Section 4: Reading Comprehension", type: "reading_group", img: "d5_6.jpeg", paragraph: null,
             subQuestions: [
-                { qIdx: 46, qText: "二人は何時に会いますか。", options: ["7時30分", "8時", "8時30分", "9時"], answer: 2 },
-                { qIdx: 47, qText: "山田さんはどこへ行けばいいですか。", options: ["駅の中", "駅のホーム", "コンビニの中", "駅の外のコンビニの前"], answer: 3 }
+                { qIdx: 43, qText: "二人は何時に会いますか。", options: ["7時30分", "8時", "8時30分", "9時"], answer: 2 },
+                { qIdx: 44, qText: "山田さんはどこへ行けばいいですか。", options: ["駅の中", "駅のホーム", "コンビニの中", "駅の外のコンビニの前"], answer: 3 }
             ]
         },
         {
             sectionId: 4, sectionName: "Section 4: Reading Comprehension", type: "reading_group", img: "d7_8.jpeg", paragraph: null,
             subQuestions: [
-                { qIdx: 48, qText: "日曜日にランチセットを注文すると、ドリンクはいくらですか。", options: ["無料", "100円", "200円", "300円"], answer: 2 },
-                { qIdx: 49, qText: "午後1時45分に店へ行った場合、何を注文できませんか。", options: ["ランチセット", "水", "ドリンク", "普通のメニュー"], answer: 0 }
+                { qIdx: 45, qText: "日曜日にランチセットを注文すると、ドリンクはいくらですか。", options: ["無料", "100円", "200円", "300円"], answer: 2 },
+                { qIdx: 46, qText: "午後1時45分に店へ行った場合、何を注文できませんか。", options: ["ランチセット", "水", "ドリンク", "普通のメニュー"], answer: 0 }
             ]
         },
         {
             sectionId: 4, sectionName: "Section 4: Reading Comprehension", type: "reading_group", img: "d9_10.jpeg", paragraph: null,
             subQuestions: [
-                { qIdx: 50, qText: "午後8時30分にホテルへ着く場合、何をしますか。", options: ["ホテルに電話する", "朝食を食べる", "午後3時に戻る", "予約をキャンセルする"], answer: 0 },
-                { qIdx: 51, qText: "朝食を食べられる時間はどれですか。", options: ["午前6時30分", "午前8時", "午前9時30分", "午前10時"], answer: 1 }
+                { qIdx: 47, qText: "午後8時30分にホテルへ着く場合、何をしますか。", options: ["ホテルに電話する", "朝食を食べる", "午後3時に戻る", "予約をキャンセルする"], answer: 0 },
+                { qIdx: 48, qText: "朝食を食べられる時間はどれですか。", options: ["午前6時30分", "午前8時", "午前9時30分", "午前10時"], answer: 1 }
             ]
         },
         {
             sectionId: 4, sectionName: "Section 4: Reading Comprehension", type: "reading_group", img: "d11_12.jpeg", paragraph: null,
             subQuestions: [
-                { qIdx: 52, qText: "月曜日はどの場所で授業をしますか。", options: ["d11_o1.jpeg", "d11_o2.jpeg", "d11_o3.jpeg", "d11_o4.jpeg"], answer: 2 },
-                { qIdx: 53, qText: "火曜日からはどうなりますか。", options: ["授業がなくなります。", "302教室を使います。", "いつもの教室に戻ります。", "3階で授業を続けます。"], answer: 2 }
+                { qIdx: 49, qText: "月曜日はどの場所で授業をしますか。", options: ["d11_o1.jpeg", "d11_o2.jpeg", "d11_o3.jpeg", "d11_o4.jpeg"], answer: 2 },
+                { qIdx: 50, qText: "火曜日からはどうなりますか。", options: ["授業がなくなります。", "302教室を使います。", "いつもの教室に戻ります。", "3階で授業を続けます。"], answer: 2 }
             ]
         },
         {
             sectionId: 4, sectionName: "Section 4: Reading Comprehension", type: "reading_group", img: "d13_14.jpeg", paragraph: null,
             subQuestions: [
-                { qIdx: 54, qText: "このイベントに持っていけるものはどれですか。", options: ["大きい机", "大きいソファー", "小さい電気製品", "大きい<ruby>棚<rt>たな</rt></ruby>"], answer: 2 },
-                { qIdx: 55, qText: "10時から11時まで何がありますか。", options: ["食事", "説明", "買い物", "掃除"], answer: 1 }
+                { qIdx: 51, qText: "このイベントに持っていけるものはどれですか。", options: ["大きい机", "大きいソファー", "小さい電気製品", "大きい<ruby>棚<rt>たな</rt></ruby>"], answer: 2 },
+                { qIdx: 52, qText: "10時から11時まで何がありますか。", options: ["食事", "説明", "買い物", "掃除"], answer: 1 }
             ]
         }
     ];
 
     let currentStep = 0;
-    let userAnswers = new Array(56).fill(null);
+    let userAnswers = new Array(53).fill(null);
     let timerInterval, timeLeft = 60 * 60, audioPlayCounts = {}, isAudioPlayingCurrently = false;
 
     function startExam() {
-        if (loggedInStudentCode && loggedInStudentCode !== "TEACHER_ADMIN") {
-            const todayStr = new Date().toISOString().split('T')[0];
-            const attemptRef = db.ref(`${DB_REPORTS}/${loggedInStudentCode}/attempts/${todayStr}`);
-            attemptRef.transaction((currentCount) => {
-                return (currentCount || 0) + 1;
-            });
-            db.ref(`${DB_REPORTS}/${loggedInStudentCode}/name`).set(loggedInStudentName);
-        }
-
         document.getElementById('landingScreen').style.display = 'none';
         document.getElementById('examScreen').style.display = 'block';
         document.getElementById('studentDisplay').innerText = "User: " + loggedInStudentName;
@@ -1189,13 +1215,13 @@
 
         let secStats = {
             1: { name: "1. Script & Vocabulary", total: 15, correct: 0 },
-            2: { name: "2. Conversation & Expression", total: 15, correct: 0 },
+            2: { name: "2. Conversation & Expression", total: 12, correct: 0 },
             3: { name: "3. Listening Comprehension", total: 12, correct: 0 },
             4: { name: "4. Reading Comprehension", total: 14, correct: 0 }
         };
 
         let reviewHtml = "";
-        let totalQuestions = 56;
+        let totalQuestions = 53;
 
         examSteps.forEach(st => {
             let subs = st.type === 'single' ? [{ qIdx: st.qIdx, answer: st.answer, options: st.options }] : st.subQuestions;
@@ -1240,21 +1266,25 @@
         let finalJftScore = Math.round(10 + (grandCorrect / totalQuestions) * 240); 
 
         if (loggedInStudentCode && loggedInStudentCode !== "TEACHER_ADMIN") {
+            const todayStr = new Date().toISOString().split('T')[0];
             const reportRef = db.ref(`${DB_REPORTS}/${loggedInStudentCode}`);
+
             reportRef.once('value').then((snap) => {
-                let data = snap.val() || {};
-                let history = data.history || [];
-                
-                history.push({
-                    score: finalJftScore,
-                    date: new Date().toLocaleString()
-                });
+                let repData = snap.val() || {};
+                let dailyScores = repData.dailyScores || [];
+
+                if (repData.lastExamDate !== todayStr) {
+                    dailyScores = [];
+                }
+
+                dailyScores.push(finalJftScore);
 
                 reportRef.update({
                     name: loggedInStudentName,
                     lastScore: finalJftScore,
-                    lastDate: new Date().toLocaleDateString(),
-                    history: history
+                    lastDate: new Date().toLocaleString(),
+                    lastExamDate: todayStr,
+                    dailyScores: dailyScores
                 });
             });
         }
